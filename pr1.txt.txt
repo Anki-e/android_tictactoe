@@ -1,0 +1,106 @@
+package com.example.tictt;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.widget.ImageViewCompat;
+
+import android.media.MediaPlayer;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.net.Uri;
+import android.os.Environment;
+import android.os.Bundle;
+import android.app.Activity;
+import android.view.Menu;
+import android.widget.MediaController;
+import android.widget.VideoView;
+
+public class MainActivity extends AppCompatActivity {
+    boolean gameActive = true;
+    //player 0-X , 1-O
+    int acplayer = 0;
+    int[] gamestate = {2,2,2,2,2,2,2,2,2};
+    //2-null
+    int[][] winpositions = {{0,1,2},{3,4,5},{6,7,8},{0,3,6},{1,4,7},{2,5,8},{0,4,8},{2,4,6}};
+    public void TapFn(View view){
+        ImageView img = (ImageView) view;
+        int tappedimage = Integer.parseInt(img.getTag().toString());
+        if(gamestate[tappedimage]==2 && gameActive) {
+            gamestate[tappedimage] = acplayer;
+            img.setTranslationY(-1000f);
+            if (acplayer == 0) {
+                img.setImageResource(R.drawable.tttx);
+                acplayer = 1;
+                TextView status = findViewById(R.id.status);
+                status.setText("O's turn");
+            } else {
+                img.setImageResource(R.drawable.ottt);
+                acplayer = 0;
+                TextView status = findViewById(R.id.status);
+                status.setText("X's turn");
+            }
+
+            img.animate().translationYBy(1000f).setDuration(100);
+        }
+        //if player wins
+        for (int[] winposition : winpositions) {
+            if(gamestate[winposition[0]]==gamestate[winposition[1]] &&
+                    gamestate[winposition[0]]==gamestate[winposition[2]] &&
+                    gamestate[winposition[0]]!=2){
+                gameActive = false;
+                //player wins
+                String winnerstr ;
+                if(gamestate[winposition[0]]==0){
+                    winnerstr= "X won";
+                }else{
+                    winnerstr="O won";
+                }
+
+                TextView status = findViewById(R.id.status);
+                status.setText(winnerstr);
+
+            }
+        }
+
+    }
+    public void restartgame(View view){
+        gameActive = true;
+        acplayer = 0;
+        for(int i=0; i<gamestate.length; i++) {
+            gamestate[i] = 2;
+        }
+        ((ImageView)findViewById(R.id.imageView1)).setImageResource(0);
+        ((ImageView)findViewById(R.id.imageView2)).setImageResource(0);
+        ((ImageView)findViewById(R.id.imageView3)).setImageResource(0);
+        ((ImageView)findViewById(R.id.imageView4)).setImageResource(0);
+        ((ImageView)findViewById(R.id.imageView5)).setImageResource(0);
+        ((ImageView)findViewById(R.id.imageView6)).setImageResource(0);
+        ((ImageView)findViewById(R.id.imageView7)).setImageResource(0);
+        ((ImageView)findViewById(R.id.imageView8)).setImageResource(0);
+        ((ImageView)findViewById(R.id.imageView9)).setImageResource(0);
+
+
+    }
+    VideoView video2;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        VideoView video2= (VideoView) findViewById(R.id.video2);
+        String path= "android.resource://com.example.tictt/"+R.raw.neon_bg;
+        Uri uri = Uri.parse(path);
+        video2.setVideoURI(uri);
+        video2.start();
+        video2.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                mp.setLooping(true);
+            }
+        });
+    }
+
+
+
+}
